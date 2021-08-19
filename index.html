@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <meta name="description"
+      content="Data submitted by the user via this form will be passed to the server. After that an email confirmation will be sent to the email address provided by the user.">
+    <meta name="author" content="Michal Jankowski">
+
+    <title>User Form</title>
+
+    <!--  <link rel="icon" href="./images/favicon.ico" type="image/png"> -->
+
+    <link rel="stylesheet" href="./main.css" type="text/css">
+  </head>
+
+  <body>
+
+    <div class=pane>
+      <div class="form-container">
+
+        <form id="my-form">
+          <div class="flex">
+            <div class="input-group short">
+              <label for="first-name">First name</label><br>
+              <input id="first-name" name="first-name" oninput="validateInput(this)" type="text" autofocus required>
+            </div>
+
+            <div class="input-group short">
+              <label for="last-name">Last name</label><br>
+              <input id="last-name" name="last-name" oninput="validateInput(this)" type="text" required>
+            </div>
+
+            <div class="input-group short">
+              <label for="email">Email address</label><br>
+              <input id="email" name="email" oninput="validateInput(this)" type="email" required>
+            </div>
+
+            <div class="input-group short">
+              <label for="telephone">Telephone number</label><br>
+              <input id="telephone" name="telephone" oninput="validateInput(this)" type="tel" required>
+            </div>
+
+            <div class="input-group short">
+              <label for="address1">Address 1</label><br>
+              <input id="address1" name="address1" oninput="validateInput(this)" type="text" required>
+            </div>
+
+            <div class="input-group short">
+              <label for="address2">Address 2</label><br>
+              <input id="address2" name="address2" oninput="validateInput(this)" type="text">
+            </div>
+
+            <div class="input-group short">
+              <label for="town">Town</label><br>
+              <input id="town" name="town" oninput="validateInput(this)" type="text" required>
+            </div>
+
+            <div class="input-group short">
+              <label for="county">County</label><br>
+              <input id="county" name="county" oninput="validateInput(this)" type="text">
+            </div>
+
+            <div class="input-group short">
+              <label for="postcode">Postcode</label><br>
+              <input id="postcode" name="postcode" oninput="validateInput(this)" type="text" required>
+            </div>
+
+            <div class="input-group short">
+              <label for="country">Country</label><br>
+              <select id="country" name="country" required>
+              </select>
+            </div>
+          </div>
+
+
+          <div class="input-group">
+            <label for="description">Description</label><br>
+            <textarea name="description" id="description" rows="10" required></textarea>
+          </div>
+
+          <div class="input-group">
+            <label for="cv">Your C.V.</label><br>
+            <span>Select a file</span>&nbsp;<input id="cv" name="cv" type="file"
+              accept=".pdf,.doc,.docx,.xml">
+          </div>
+
+          <div class="input-group short">
+            <button id="submit">Submit</button>
+          </form>
+
+
+      </div>
+    </div>
+
+
+    <script src="./main.js"></script>
+  </body>
+
+</html>
