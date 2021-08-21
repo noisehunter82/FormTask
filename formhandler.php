@@ -1,66 +1,102 @@
 <?php
-/* 
-error_reporting(-1);
-ini_set('display_errors', 'On');
-set_error_handler("var_dump"); */
+
+include('./helperFunctions.php');
 
 $executionStartTime = microtime(true) / 1000;
 
 
 // Handle onload request
-if (isset($_GET) && $_GET['query'] == 'onloadData') {
+if (isset($_GET['onloadData'])) {
 
-  $file = file_get_contents("countries.json");
-  $countries = json_decode($file, true);
+  $json = file_get_contents("./countries.json");
+  $countries = json_decode($json, true);
 
   $countriesArr = [];
+
   foreach ($countries as $country) {
-    $countriesArr[] = $country["name"];
+    $countriesArr[] = $country['name'];
   }
 
   usort($countriesArr, function ($a, $b) {
-    return $a['name'] <=> $b['name'];
+    return $a <=> $b;
   });
 
-  $output['data']['countriesArr'] = $countriesArr;
+  if (count($countriesArr) != 0) {
 
-  $output['status']['code'] = "200";
-  $output['status']['name'] = "ok";
-  $output['status']['description'] = "countries list returned";
-  $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data']['countriesArr'] = $countriesArr;
 
-  header('Content-Type: application/json; charset=UTF-8');
+    $output['status']['code'] = "200";
+    $output['status']['name'] = "ok";
+    $output['status']['description'] = "success";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
-  echo json_encode($output);
+    header('Content-Type: application/json; charset=UTF-8');
 
-  exit;
+    echo json_encode($output);
+
+    exit;
+  } else {
+
+    $output['status']['code'] = "500";
+    $output['status']['name'] = "fail";
+    $output['status']['description'] = "Server error. Try reloading the page.";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+
+    header('Content-Type: application/json; charset=UTF-8');
+
+    echo json_encode($output);
+
+    exit;
+  }
 }
+
 
 // Handle form submission
 if (isset($_POST) && !empty($_POST)) {
 
+  $validatedData;
+
+  foreach($_POST as $key => $value) {
+    $validatedData[$key] = validateInput($key,$value);
+  }
+
+    
+  $firstName = $validatedData['first-name'];
+  $lastName = $validatedData['last-name'];
+  $email = $validatedData['email'];
+  $telephone = $validatedData['telephone'];
+  $address1 = $validatedData['address1'];
+  $address2 = isset($validatedData['address2']) ? $validatedData['address2'] : '';
+  $town = $validatedData['town'];
+  $county = $validatedData['county'];
+  $country = $validatedData['country'];
+  $postcode = $validatedData['postcode'];
+  $description = htmlspecialchars($validatedData['description']);
+
+
+
   // Essentials
-  $to = $_POST['email'];
+  $to = $email;
   $subject = "Submitted form data";
 
   // HTML message
   $htmlMessage = '
-  <h1>Submitted info:</h1>
-  <p>First name: <span>' . $_POST['first-name'] . '</span></p>
-  <p>Last name: <span>' . $_POST['last-name'] . '</span></p>
-  <p>Email: <span>' . $_POST['email'] . '</span></p>
-  <p>Telephone: <span>' . $_POST['telephone'] . '</span></p>
-  <p>Address Line 1: <span>' . $_POST['address1'] . '</span></p>
-  <p>Address Line 2: <span>'  . $_POST['address2'] . '</span></p>
-  <p>Town: <span>' . $_POST['town'] . '</span></p>
- <p>County: <span>' . $_POST['county'] . '</span></p>
-  <p>Country: <span>' . $_POST['country'] . '</span></p>
-  <p>Postcode: <span>' . $_POST['postcode'] . '</span></p>
- <p>Description: <span>' . $_POST['description'] . '</span></p>';
+  <h1>Submitted form:</h1>
+  <p>First name: <span>' . $firstName . '</span></p>
+  <p>Last name: <span>' . $lastName . '</span></p>
+  <p>Email: <span>' . $email . '</span></p>
+  <p>Telephone: <span>' . $telephone . '</span></p>
+  <p>Address Line 1: <span>' . $address1 . '</span></p>
+  <p>Address Line 2: <span>'  . $address2 . '</span></p>
+  <p>Town: <span>' . $town . '</span></p>
+ <p>County: <span>' . $county . '</span></p>
+  <p>Country: <span>' . $country . '</span></p>
+  <p>Postcode: <span>' . $postcode . '</span></p>
+ <p>Description: <span>' . $description . '</span></p>';
 
-  // Send email without attachment
-
-  if (!isset($_FILES['cv']) || $_FILES['cv']['error'] != 0) {
+  
+ // Send email without attachment
+  if (!isset($_FILES['cv']) || $_FILES['cv']['error'] != 0 || !isCorrectFormat($_FILES['cv']['name'])) {
 
     $headers[] = 'MIME-Version: 1.0';
     $headers[] = 'Content-type:text/html;charset=utf-8';
@@ -68,111 +104,109 @@ if (isset($_POST) && !empty($_POST)) {
 
     if (mail($to, $subject, $htmlMessage, implode("\r\n", $headers))) {
 
-      $output['status']['code'] = "200";
-      $output['status']['name'] = "ok";
-      $output['status']['description'] = "form data received and emailed";
-      $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+      $output['status']['code'] = '200';
+      $output['status']['name'] = 'ok';
+      $output['status']['description'] = 'Success! Form data received and emailed to ' . $email;
+      $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . ' ms';
 
       header('Content-Type: application/json; charset=UTF-8');
 
       echo json_encode($output);
-
       exit;
+
     } else {
-      $output['status']['code'] = "500";
-      $output['status']['name'] = "fail";
-      $output['status']['description'] = "Server error";
-      $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+
+      $output['status']['code'] = '500';
+      $output['status']['name'] = 'fail';
+      $output['status']['description'] = 'Server error. Try again.';
+      $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . ' ms';
 
       header('Content-Type: application/json; charset=UTF-8');
 
       echo json_encode($output);
-
       exit;
     }
 
-    //Send email with aattachment
+  
   } else {
+    //Send email with attachment
+
 
     $file_name = $_FILES['cv']['name'];
     $temp_name = $_FILES['cv']['tmp_name'];
     $file_type = $_FILES['cv']['type'];
     $file_size = $_FILES['cv']['size'];
 
-             
-
     $base = basename($file_name);
 
-    $extension = substr($base, strlen($base) - 4, strlen($base));
 
-    //only these file types will be allowed
-    $allowed_extensions = array(".pdf", ".doc", "docx", ".xml");
+    $file = fopen($temp_name, 'rb');
+    $data = fread($file, filesize($temp_name));
+    fclose($file);
+    $encoded_data = chunk_split(base64_encode($data));
 
+    $mime_boundary = md5(time());  //unique identifier
 
-    if (in_array($extension, $allowed_extensions)) {
+    // Standard headers
+    $headers[] = 'From: FormTask<formtask@example.com>';
+    $headers[] = 'Reply-To: FormTask<formtask@example.com>';
+    $headers[] = 'MIME-Version: 1.0';
 
-      echo($file_size);
+    //declare multiple kinds of email (plain text + attch)
+    $headers[] = 'Content-Type: multipart/mixed; boundary="' . $mime_boundary;
 
-      $fp =    @fopen($temp_name, "rb");
-      $data =  @fread($fp, filesize($temp_name));
-      @fclose($fp);
-      $encoded_data = chunk_split(base64_encode($data)); 
-
-      $mime_boundary = md5(time());  //unique identifier
-      
-      //declare multiple kinds of email (plain text + attch)
-      $headers[] = 'MIME-Version: 1.0';
-      $headers[] = 'From: FormTask<formtask@example.com>';
-      $headers[] = 'Content-Type: multipart/mixed; boundary="' . $mime_boundary . '"';
-      
-      //message part
-      $message[] = '--' . $mime_boundary;
-      $message[] = 'Content-type:text/html;charset=utf-8';
-      $message[] = 'Content-Transfer-Encoding:7bit';
-      $message[] = $htmlMessage;
+    //message part
+    $messages[] = '--' . $mime_boundary;
+    $messages[] = 'Content-type:text/html;charset=utf-8';
+    $messages[] = 'Content-Transfer-Encoding:7bit';
+    $messages[] = $htmlMessage;
 
 
-      //attch part
-      $message[] = '--' . $mime_boundary;
-      $message[] = 'Content-Type:' . $file_type . ';name=' . $file_name;
-      $message[] = 'Content-Transfer-Encoding:base64';
-      $message[] = 'Content-Disposition:attachment; filename=' . $file_name . ';size=' . filesize($file_temp);
-      $message[] = $encoded_data;  
+    //attch part
+    $messages[] = '--' . $mime_boundary;
+    $messages[] = 'Content-Type: ' . $file_type . ';name=' . $file_name;
+    $messages[] = 'Content-Transfer-Encoding: base64';
+    $messages[] = 'Content-Disposition: attachment;filename=' . $file_name;
+    $messages[] = $encoded_data . "\r\n";
+    $messages[] = '--' . $mime_boundary . "--\r\n";
 
 
 
-      if (mail($to, $subject, implode("\r\n", $message), implode("\r\n", $headers))) {
+    if (mail($to, $subject, implode("\r\n", $messages), implode("\r\n", $headers))) {
 
-        $output['status']['code'] = "200";
-        $output['status']['name'] = "ok";
-        $output['status']['description'] = "form data received and emailed";
-        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+      $output['status']['code'] = '200';
+      $output['status']['name'] = 'ok';
+      $output['status']['description'] = 'Success! Form data received and emailed to' . $email;
+      $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . ' ms';
 
-        header('Content-Type: application/json; charset=UTF-8');
+      header('Content-Type: application/json; charset=UTF-8');
 
-        echo json_encode($output);
+      echo json_encode($output);
+      exit;
 
-        exit;
-      } else {
-        $output['status']['code'] = "500";
-        $output['status']['name'] = "fail";
-        $output['status']['description'] = "Server error";
-        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    } else {
 
-        header('Content-Type: application/json; charset=UTF-8');
+      $output['status']['code'] = '500';
+      $output['status']['name'] = 'fail';
+      $output['status']['description'] = 'Server error. Try again.';
+      $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . ' ms';
 
-        echo json_encode($output);
+      header('Content-Type: application/json; charset=UTF-8');
 
-        exit;
-      }
+      echo json_encode($output);
+      exit;
+
     }
   }
 }
 
 
-$output['status']['code'] = "400";
-$output['status']['name'] = "Bad request";
-$output['status']['description'] = "Missing data! Make sure all fields are filled.";
+$output['status']['code'] = '400';
+$output['status']['name'] = 'bad request';
+$output['status']['description'] = 'Bad request. Try again.';
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . ' ms';
+
+header('Content-Type: application/json; charset=UTF-8');
 
 echo json_encode($output);
 

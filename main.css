@@ -73,7 +73,7 @@ textarea {
   border-radius: 7px;
 }
 
-.short input.invalid {
+.invalid {
   border:solid 2px red;
   color: red;
 }
@@ -90,7 +90,10 @@ cursor: pointer;
 
 button:active {
   background-color: darkgreen;
-  
+}
+
+#status {
+  text-align: end;
 }
 
 @media only screen and (max-width: 600px) {

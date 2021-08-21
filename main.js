@@ -1,4 +1,5 @@
-const firstName = document.getElementById('first-name'),
+const form = document.getElementById('my-form'),
+  firstName = document.getElementById('first-name'),
   lastName = document.getElementById('last-name'),
   email = document.getElementById('email'),
   telephone = document.getElementById('telephone'),
@@ -8,49 +9,71 @@ const firstName = document.getElementById('first-name'),
   county = document.getElementById('county'),
   country = document.getElementById('country'),
   description = document.getElementById('description'),
-  cv = document.getElementById('cv');
+  cv = document.getElementById('cv'),
+  submitButton = document.getElementById('submit'),
+  status = document.getElementById('status');
 
 
-// Populates 'select' element of the form.
 
-const populateSelect = (array) => {
-  const select = document.getElementById('country');
+// Display functions
 
-  const empty = document.createElement('option');
-  empty.setAttribute('value', '');
-  empty.innerText = '-- Select country --';
+const populateSelect = array => {
 
-  select.append(empty);
-
-  array.forEach(country => {
-
+  array.forEach(name => {
 
     const option = document.createElement('option');
-    option.setAttribute('value', country);
-    option.innerText = country;
+    option.setAttribute('value', name);
+    option.innerText = name;
 
-    select.append(option);
+    country.append(option);
 
   });
 
 }
 
+
+const resetForm = () => {
+
+  const inputsFields = document.querySelectorAll('input');
+
+  inputsFields.forEach(input => {
+    input.value = '';
+
+  });
+
+  document.getElementById('empty').setAttribute('selected', true);
+
+  description.value = '';
+
+}
+
+
+const outputStatus = string => status.innerText = string;
+
+
+
 // HTTP Requests
 
 const fetchCountries = () => {
 
-  const xhr = new XMLHttpRequest();
-
-  const url = './formhandler.php?query=onloadData';
+  const xhr = new XMLHttpRequest(),
+    url = './formhandler.php?onloadData=true';
 
   xhr.responseType = 'json';
+
   xhr.onreadystatechange = () => {
+
     if (xhr.readyState === XMLHttpRequest.DONE) {
+
       if (xhr.response.status.name === 'ok') {
+
         populateSelect(xhr.response.data.countriesArr);
+
       } else {
-        return;
+
+        outputStatus(xhr.response.status.description);
       }
+
     }
   }
 
@@ -65,34 +88,37 @@ const postFormData = () => {
 
   const xhr = new XMLHttpRequest(),
     url = './formhandler.php',
-    fd = new FormData(document.getElementById('my-form'));
+    fd = new FormData(form);
 
-  if (cv.value) {
-    fd.append("cv", cv.value);
+  if (cv.files[0]) {
+    fd.append("cv", cv.files[0]);
   }
-  
+
   console.log(fd);
 
   xhr.responseType = 'json';
-  xhr.onreadystatechange = () => {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-      if (xhr.response) {
-        console.log(xhr.response);
-        return;
-      }
-    }
-  }
 
+  xhr.onreadystatechange = () => {
+
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+
+      if (xhr.response.status.name === 'ok') resetForm();
+
+      outputStatus(xhr.response.status.description);
+
+    }
+
+  }
   xhr.open('POST', url);
 
   xhr.send(fd);
-
 }
+
 
 
 // Input validation
 
-const validateInput = (el) => {
+const validateInput = el => {
   let pattern;
 
   switch (el.id) {
@@ -107,7 +133,7 @@ const validateInput = (el) => {
       pattern = /^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
       break;
     case 'telephone':
-      pattern = /^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$/;
+      pattern = /^([0-9\+\-\(\)\s]){7,25}$/;
       break;
     case 'address1':
     case 'address2':
@@ -115,8 +141,8 @@ const validateInput = (el) => {
       break;
     case 'postcode':
       pattern = /^([a-zA-Z0-9\s])*$/;
-
-
+      break;
+   
   }
 
   if (el.value.match(pattern)) {
@@ -133,25 +159,54 @@ const checkRequiredFields = () => {
 
   const requiredFields = document.querySelectorAll("*[required]");
 
+  let allRequiredFilled = true;
+
   requiredFields.forEach(field => {
-    if (field.value === '') return false;
+    if (!field.value) {
+      allRequiredFilled = false;
+    }
+
   });
 
-  return true;
+  return allRequiredFilled;
 }
+
+
+
+const checkIfAllValid = () => {
+
+  const fields = document.querySelectorAll('input');
+
+  allFieldsValid = true;
+
+  fields.forEach(field => {
+    if (field.classList.contains('invalid')) {
+      allFieldsValid = false;
+    };
+  });
+
+  return allFieldsValid;
+}
+
 
 
 // Event handlers
 
-document.getElementById('submit').onclick = (event) => {
-  
-  event.preventDefault();
+submitButton.onclick = e => {
 
-  if (checkRequiredFields()) {
-    postFormData();
-  } else {
+  e.preventDefault();
+
+  if (!checkRequiredFields()) {
+    outputStatus('One or more required fields are empty.');
     return;
   }
+
+  if (!checkIfAllValid()) {
+    outputStatus('Some of the fields contain invalid characters.');
+    return;
+  }
+
+  postFormData();
 
 }
 
