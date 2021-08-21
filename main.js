@@ -163,7 +163,6 @@ const checkRequiredFields = () => {
   let allRequiredFilled = true;
 
   const requiredFields = document.querySelectorAll("*[required]");
-  console.log(requiredFields);
 
   requiredFields.forEach(field => {
     if (!field.value) {
