@@ -149,15 +149,25 @@ const validateInput = el => {
 };
 
 
+const checkIfNotEmpty= el => {
+  if (el.value == "") {
+    el.classList.add('invalid');
+  } else {
+    el.classList.remove('invalid');
+  }
+}
+
 
 const checkRequiredFields = () => {
 
-  const requiredFields = document.querySelectorAll("*[required]");
-
   let allRequiredFilled = true;
+
+  const requiredFields = document.querySelectorAll("*[required]");
+  console.log(requiredFields);
 
   requiredFields.forEach(field => {
     if (!field.value) {
+      if (!field.classList.contains('invalid')) field.classList.add('invalid');
       allRequiredFilled = false;
     }
 
@@ -169,10 +179,11 @@ const checkRequiredFields = () => {
 
 
 const checkIfAllValid = () => {
+  
+  allFieldsValid = true;
 
   const fields = document.querySelectorAll('input');
 
-  allFieldsValid = true;
 
   fields.forEach(field => {
     if (field.classList.contains('invalid')) {

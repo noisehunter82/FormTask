@@ -12,13 +12,16 @@
     <title>User form</title>
 
     <link rel="stylesheet" href="./main.css" type="text/css">
-
-    <script src="./main.js" async></script>
+    
     <noscript>
       This website relies on JavaScript, which you appear to have disabled. You will not be
       able to use many of this website's features without JavaScript enabled.
     </noscript>
+    <script src="./main.js" async></script>
+
   </head>
+
+
 
   <body>
 
@@ -30,27 +33,27 @@
           <div class="flex">
 
             <div class="input-group short">
-              <label for="first-name">First name</label><br>
+              <label for="first-name">First name <sup>*</sup></label><br>
               <input id="first-name" name="first-name" oninput="validateInput(this)" type="text" autofocus required>
             </div>
 
             <div class="input-group short">
-              <label for="last-name">Last name</label><br>
+              <label for="last-name">Last name <sup>*</sup></label><br>
               <input id="last-name" name="last-name" oninput="validateInput(this)" type="text" required>
             </div>
 
             <div class="input-group short">
-              <label for="email">Email address</label><br>
+              <label for="email">Email address <sup>*</sup></label><br>
               <input id="email" name="email" oninput="validateInput(this)" type="email" required>
             </div>
 
             <div class="input-group short">
-              <label for="telephone">Telephone number</label><br>
+              <label for="telephone">Telephone number <sup>*</sup></label><br>
               <input id="telephone" name="telephone" oninput="validateInput(this)" type="tel" required>
             </div>
 
             <div class="input-group short">
-              <label for="address1">Address 1</label><br>
+              <label for="address1">Address 1 <sup>*</sup></label><br>
               <input id="address1" name="address1" oninput="validateInput(this)" type="text" required>
             </div>
 
@@ -60,7 +63,7 @@
             </div>
 
             <div class="input-group short">
-              <label for="town">Town</label><br>
+              <label for="town">Town <sup>*</sup></label><br>
               <input id="town" name="town" oninput="validateInput(this)" type="text" required>
             </div>
 
@@ -70,13 +73,13 @@
             </div>
 
             <div class="input-group short">
-              <label for="postcode">Postcode</label><br>
+              <label for="postcode">Postcode <sup>*</sup></label><br>
               <input id="postcode" name="postcode" oninput="validateInput(this)" type="text" required>
             </div>
 
             <div class="input-group short">
-              <label for="country">Country</label><br>
-              <select id="country" name="country" required>
+              <label for="country">Country <sup>*</sup></label><br>
+              <select id="country" name="country" onchange="checkIfNotEmpty(this)" required>
                 <option id="empty" value = "">-- Select country --</option>
               </select>
             </div>
@@ -85,8 +88,8 @@
 
 
           <div class="input-group">
-            <label for="description">Description</label><br>
-            <textarea name="description" id="description" rows="10" required></textarea>
+            <label for="description">Description <sup>*</sup></label><br>
+            <textarea name="description" id="description" rows="10" oninput="checkIfNotEmpty(this)" required></textarea>
           </div>
 
           <div class="input-group">

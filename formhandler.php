@@ -82,7 +82,7 @@ if (isset($_POST) && !empty($_POST)) {
   $address1 = $validatedData['address1'];
   $address2 = isset($validatedData['address2']) ? $validatedData['address2'] : '';
   $town = $validatedData['town'];
-  $county = $validatedData['county'];
+  $county = isset($validatedData['county']) ? $validatedData['county'] : '';
   $country = $validatedData['country'];
   $postcode = $validatedData['postcode'];
   $description = htmlspecialchars($validatedData['description']);
