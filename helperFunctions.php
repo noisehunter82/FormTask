@@ -1,6 +1,6 @@
 <?php
 
-// Checks file format by extension
+// Checks file format by its extension
 function isCorrectFormat($file_name) {
 
   if (!isset($file_name)) {
@@ -8,12 +8,9 @@ function isCorrectFormat($file_name) {
   }
 
   $base = basename($file_name);
-
   $extension = substr($base, strlen($base) - 4, strlen($base));
 
-  //only these file types will be allowed
   $allowed_extensions = array(".pdf", ".doc", "docx", ".xml");
-
 
   if (in_array($extension, $allowed_extensions)) {
     return true;
@@ -22,7 +19,7 @@ function isCorrectFormat($file_name) {
   return false;
 }
 
-
+// Validate data from the client
 function validateInput($type, $string) {
 
   switch ($type) {
@@ -51,4 +48,4 @@ function validateInput($type, $string) {
   }
 
   return filter_var($string, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $pattern)));
-};
+}

@@ -15,7 +15,7 @@ const form = document.getElementById('my-form'),
 
 
 
-// Display functions
+// DISPLAY
 
 const populateSelect = array => {
 
@@ -28,7 +28,6 @@ const populateSelect = array => {
     country.append(option);
 
   });
-
 }
 
 
@@ -38,7 +37,6 @@ const resetForm = () => {
 
   inputsFields.forEach(input => {
     input.value = '';
-
   });
 
   document.getElementById('empty').setAttribute('selected', true);
@@ -51,8 +49,7 @@ const resetForm = () => {
 const outputStatus = string => status.innerText = string;
 
 
-
-// HTTP Requests
+// HTTP REQUESTS
 
 const fetchCountries = () => {
 
@@ -94,8 +91,6 @@ const postFormData = () => {
     fd.append("cv", cv.files[0]);
   }
 
-  console.log(fd);
-
   xhr.responseType = 'json';
 
   xhr.onreadystatechange = () => {
@@ -116,7 +111,7 @@ const postFormData = () => {
 
 
 
-// Input validation
+// VALIDATION
 
 const validateInput = el => {
   let pattern;
@@ -190,7 +185,7 @@ const checkIfAllValid = () => {
 
 
 
-// Event handlers
+// EVENT HANDLERS
 
 submitButton.onclick = e => {
 
